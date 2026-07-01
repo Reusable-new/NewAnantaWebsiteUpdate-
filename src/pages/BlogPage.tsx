@@ -1,11 +1,12 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import type { LucideIcon } from 'lucide-react';
 import { ArrowRight, Clock, User, Search, Calendar, BookOpen, TrendingUp, Zap } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useAnimations';
-import { categories, blogPosts, trendingTopics } from '../data/blogPosts';
+import { categories, getBlogPosts, trendingTopics } from '../services/contentService';
 
-const trendingIconMap = {
+const trendingIconMap: Record<string, LucideIcon> = {
   'Generative AI': Zap,
   'Cloud Native': TrendingUp,
   'Web Performance': BookOpen,
@@ -14,12 +15,13 @@ const trendingIconMap = {
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const filteredPosts = blogPosts.filter((post) => {
+  const posts = getBlogPosts();
+  const filteredPosts = posts.filter((post) => {
     const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-  const featuredPost = blogPosts.find((p) => p.featured);
+  const featuredPost = posts.find((p) => p.featured);
   const { ref, isVisible } = useScrollAnimation();
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
@@ -51,6 +53,7 @@ export default function BlogPage() {
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-4"><span className="px-3 py-1 rounded-lg bg-white/20 text-white text-xs font-semibold">Featured</span><span className="px-3 py-1 rounded-lg bg-white/10 text-primary-200 text-xs font-medium">{featuredPost.category}</span></div>
+            <img src={featuredPost.image} alt={featuredPost.title} className="w-full h-64 rounded-3xl object-cover mb-6" />
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 group-hover:text-primary-100 transition-colors">{featuredPost.title}</h2>
             <p className="text-primary-200 max-w-2xl mb-6 leading-relaxed">{featuredPost.excerpt}</p>
             <div className="flex flex-wrap items-center gap-4 text-primary-300 text-sm">

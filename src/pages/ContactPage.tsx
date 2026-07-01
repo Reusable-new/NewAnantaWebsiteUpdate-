@@ -1,32 +1,92 @@
 import { useState, useRef } from 'react';
+import emailjs from '@emailjs/browser';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, MessageSquare, Building2, Globe } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useAnimations';
+import { addLead } from '../services/contentService';
 
 const contactInfo = [
-  { icon: Mail, label: 'Email', value: 'contact@anantabyte.com', desc: 'We respond within 24 hours' },
+  { icon: Mail, label: 'Email', value: 'conta@canantbyte.com', desc: 'We respond within 2 hours' },
   { icon: Phone, label: 'Phone', value: '+91-8009976304', desc: 'Mon-Fri 9am-6pm PST' },
-  { icon: MapPin, label: 'Office', value: '123 Innovation Drive', desc: 'San Francisco, CA 94107' },
-  { icon: Clock, label: 'Hours', value: '9:00 AM - 6:00 PM', desc: 'Monday to Friday, PST' },
+  { icon: MapPin, label: 'Office', value: 'Innovation Drive', desc: 'Hall no- 6, 7, Vikas Mall, vasant vihar, Dehradun' },
+  { icon: Clock, label: 'Hours', value: '9:00 AM - 6:00 PM', desc: 'Monday to Friday, IST & UTC' },
 ];
 
 const offices = [
-  { city: 'San Francisco', country: 'USA', type: 'Headquarters' },
-  { city: 'London', country: 'UK', type: 'European Office' },
-  { city: 'Singapore', country: 'SG', type: 'Asia Pacific Office' },
+  // { city: 'San Francisco', country: 'USA', type: 'Headquarters' },
+  // { city: 'London', country: 'UK', type: 'European Office' },
+  // { city: 'Singapore', country: 'SG', type: 'Asia Pacific Office' },
+  { city: 'Dehradun', country: 'India', type: 'Headquarters' },
 ];
 
-const serviceOptions = ['Web Development', 'App Development', 'Chatbot Development', 'AI/ML Solutions', 'UI/UX Design', 'Cloud Solutions', 'Digital Marketing'];
+const serviceOptions = ['Web Development', 'App Development', 'AI/ML Solutions', 'UI/UX Design', 'Cloud Solutions', 'QA Testing Services '];
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', company: '', service: '', budget: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
   const { ref, isVisible } = useScrollAnimation();
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroY = useTransform(heroProgress, [0, 1], ['0%', '25%']);
 
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); setSubmitted(true); setTimeout(() => setSubmitted(false), 4000); };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setStatusMessage('');
+
+    addLead({
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      service: formData.service,
+      budget: formData.budget,
+      message: formData.message,
+    });
+
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      setSubmitted(true);
+      setFormData({ name: '', email: '', company: '', service: '', budget: '', message: '' });
+      setStatusMessage('Thanks! Your inquiry was saved in the admin portal and we will follow up soon.');
+      setTimeout(() => setSubmitted(false), 4000);
+      return;
+    }
+
+    try {
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          user_name: formData.name,
+          user_email: formData.email,
+          user_company: formData.company,
+          user_service: formData.service,
+          user_budget: formData.budget,
+          user_message: formData.message,
+          admin_email: 'conta@canantbyte.com',
+        },
+        publicKey
+      );
+
+      setSubmitted(true);
+      setFormData({ name: '', email: '', company: '', service: '', budget: '', message: '' });
+      setStatusMessage('Thanks! Your inquiry was saved in the admin portal and sent successfully.');
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (sendError) {
+      console.error('Email send error:', sendError);
+      setSubmitted(true);
+      setFormData({ name: '', email: '', company: '', service: '', budget: '', message: '' });
+      setStatusMessage('Thanks! Your inquiry was saved in the admin portal and we will follow up soon.');
+      setError('Email delivery was not available, but your request was still saved.');
+      setTimeout(() => setSubmitted(false), 4000);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => { setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value })); };
 
   const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary-400 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900 text-sm transition-all outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500";
@@ -71,15 +131,17 @@ export default function ContactPage() {
             <motion.div initial={{ opacity: 0, x: -30 }} animate={isVisible ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6 }} className="lg:col-span-3">
               <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Send Us a Message</h2>
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-8">Fill out the form and we'll get back to you within 24 hours.</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-8"></p>
                 {submitted ? (
                   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-16">
                     <div className="w-16 h-16 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4"><CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" /></div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Message Sent!</h3>
-                    <p className="text-gray-600 dark:text-gray-400">We'll get back to you shortly.</p>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Message Received!</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{statusMessage || "We'll get back to you shortly."}</p>
+                    {error && <p className="text-sm text-amber-600 mt-2">{error}</p>}
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
+                    {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label><input type="text" name="name" value={formData.name} onChange={handleChange} required className={inputCls} placeholder="John Smith" /></div>
                       <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label><input type="email" name="email" value={formData.email} onChange={handleChange} required className={inputCls} placeholder="john@company.com" /></div>
@@ -111,8 +173,8 @@ export default function ContactPage() {
                 <h3 className="font-bold mb-2 flex items-center gap-2"><MessageSquare className="w-5 h-5" /> Quick Connect</h3>
                 <p className="text-primary-200 text-sm mb-4">Need immediate assistance? Our team is available for urgent inquiries.</p>
                 <div className="space-y-3">
-                  <a href="tel:+15551234567" className="flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors"><Phone className="w-4 h-4" /> +1 (555) 123-4567</a>
-                  <a href="mailto:contact@anantabyte.com" className="flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors"><Mail className="w-4 h-4" /> contact@anantabyte.com</a>
+                  <a href="tel:+15551234567" className="flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors"><Phone className="w-4 h-4" /> +91 8009976304</a>
+                  <a href="mailto:conta@canantbyte.com" className="flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors"><Mail className="w-4 h-4" /> conta@canantbyte.com</a>
                 </div>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">

@@ -12,6 +12,7 @@ import BlogPage from './pages/BlogPage';
 import BlogDetailPage from './pages/BlogDetailPage';
 import ContactPage from './pages/ContactPage';
 import TestimonialsPage from './pages/TestimonialsPage';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/blog/:id" element={<BlogDetailPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
           <Footer />
         </div>

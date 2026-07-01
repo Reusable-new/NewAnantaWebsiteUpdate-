@@ -40,10 +40,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-              <Cpu className="w-5 h-5 text-white" />
-              <div className="absolute inset-0 bg-primary-400 rounded-xl opacity-0 group-hover:opacity-30 transition-opacity blur-sm" />
-            </div>
+            <img src="/image/logo.png" alt="Ananta Byte" className="w-10 h-10 rounded-xl object-cover transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" />
             <span className="text-xl font-bold text-gray-900 dark:text-white">
               Ananta<span className="text-primary-600 dark:text-primary-400">Byte</span>
             </span>

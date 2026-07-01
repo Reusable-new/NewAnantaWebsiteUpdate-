@@ -1,11 +1,11 @@
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
-import { blogPosts } from '../data/blogPosts';
+import { getBlogPostById } from '../services/contentService';
 
 export default function BlogDetailPage() {
   const { id } = useParams();
-  const post = blogPosts.find((item) => item.id === Number(id));
+  const post = getBlogPostById(Number(id));
 
   if (!post) {
     return (
@@ -39,6 +39,7 @@ export default function BlogDetailPage() {
             <span className="flex items-center gap-2"><Calendar className="w-4 h-4" /> {post.date}</span>
             <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> {post.readTime}</span>
           </div>
+          <img src={post.image} alt={post.title} className="w-full h-96 rounded-3xl object-cover mb-10" />
           <div className="space-y-8 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>{post.excerpt}</p>
             <p>Discover practical tips, modern architecture patterns, and real-world examples that help you implement this strategy in your next project.</p>

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Target, Heart, Lightbulb, Users, Award, Globe, Zap, Shield, CheckCircle2, Linkedin, Twitter } from 'lucide-react';
+import { ArrowRight, Target, Heart, Lightbulb, Users, Globe, Zap, Linkedin } from 'lucide-react';
 import { useScrollAnimation, useCountUp } from '../hooks/useAnimations';
 
 const values = [
@@ -12,28 +12,22 @@ const values = [
 ];
 
 const team = [
-  { name: 'Alex Rivera', role: 'CEO & Founder', bio: 'Visionary leader with 15+ years in tech. Former engineering lead at top Silicon Valley firms.' },
-  { name: 'Priya Sharma', role: 'CTO', bio: 'Expert in cloud architecture and AI. Built platforms serving millions of users.' },
-  { name: 'James Chen', role: 'Head of Design', bio: 'Award-winning designer. Passionate about creating intuitive, beautiful interfaces.' },
-  { name: 'Sarah Kim', role: 'VP of Engineering', bio: 'Full-stack expert with deep expertise in scalable distributed systems.' },
-  { name: 'Marcus Johnson', role: 'AI/ML Lead', bio: 'Published researcher in NLP and computer vision. Builds production-grade ML systems.' },
-  { name: 'Elena Volkov', role: 'Project Director', bio: 'PMP certified. Ensures every project is delivered on time and exceeds expectations.' },
+  { name: 'Suneel Jha', role: 'CEO', bio: 'Visionary leader guiding Ananta Byte’s strategy, growth, and client success.' },
+  { name: 'Sonam Sharma', role: 'CTO', bio: 'Technology leader driving platform innovation and technical excellence.' },
+  { name: 'Sonal Seth', role: 'Project Director', bio: 'Operational lead ensuring projects are delivered on time and exceed expectations.' },
 ];
 
 const stats = [
-  { value: 15, suffix: '+', label: 'Years in Business' },
-  { value: 200, suffix: '+', label: 'Projects Completed' },
-  { value: 85, suffix: '+', label: 'Team Members' },
-  { value: 20, suffix: '+', label: 'Countries Served' },
+  { value: 2, suffix: '+', label: 'Years in Business' },
+  { value: 5, suffix: '+', label: 'Projects Completed' },
+  { value: 21, suffix: '+', label: 'Team Members' },
+  { value: 4, suffix: '+', label: 'Countries Served' },
 ];
 
 const milestones = [
-  { year: '2011', title: 'Founded', desc: 'Ananta Byte was born in a small San Francisco office with a team of 5.' },
-  { year: '2014', title: 'First Major Client', desc: 'Secured our first enterprise contract, building a platform for 100K+ users.' },
-  { year: '2017', title: 'AI Division Launched', desc: 'Expanded into AI/ML, hiring top researchers and engineers.' },
-  { year: '2020', title: 'Global Expansion', desc: 'Opened offices in London and Singapore, serving clients worldwide.' },
-  { year: '2023', title: '200+ Projects', desc: 'Milestone reached: over 200 successful project deliveries.' },
-  { year: '2026', title: 'Next Chapter', desc: 'Pioneering next-gen solutions with generative AI and edge computing.' },
+  { year: '2024', title: 'Our Journey Begins', desc: 'Ananta Byte launched with a mission to build innovative digital solutions and empower growth.' },
+  { year: '2025', title: 'Early Growth', desc: 'Expanded the team and delivered the first wave of successful client projects.' },
+  { year: '2026', title: 'Today', desc: 'Continuing to scale, innovate, and deliver modern software experiences for our partners.' },
 ];
 
 export default function AboutPage() {
@@ -55,10 +49,10 @@ export default function AboutPage() {
             <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
               <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm uppercase tracking-wider">About Us</span>
               <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mt-2 mb-6">Building the <span className="gradient-text">Digital Future</span></h1>
-              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-6">Since 2011, Ananta Byte has been at the forefront of digital innovation. We combine deep technical expertise with creative thinking to deliver solutions that transform businesses.</p>
+              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-6">Since 2024, Ananta Byte has been at the forefront of digital innovation. We combine deep technical expertise with creative thinking to deliver solutions that transform businesses.</p>
               <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"><Globe className="w-4 h-4 text-primary-600 dark:text-primary-400" /><span className="text-sm font-medium text-gray-700 dark:text-gray-300">20+ Countries</span></div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"><Award className="w-4 h-4 text-primary-600 dark:text-primary-400" /><span className="text-sm font-medium text-gray-700 dark:text-gray-300">15+ Awards</span></div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"><Globe className="w-4 h-4 text-primary-600 dark:text-primary-400" /><span className="text-sm font-medium text-gray-700 dark:text-gray-300">4+ Countries</span></div>
+                {/* <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"><Award className="w-4 h-4 text-primary-600 dark:text-primary-400" /><span className="text-sm font-medium text-gray-700 dark:text-gray-300">15+ Awards</span></div> */}
                 <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"><Zap className="w-4 h-4 text-primary-600 dark:text-primary-400" /><span className="text-sm font-medium text-gray-700 dark:text-gray-300">99% Satisfaction</span></div>
               </div>
             </motion.div>
@@ -132,7 +126,7 @@ export default function AboutPage() {
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {team.map((member, i) => (
-              <motion.div key={member.name} initial={{ opacity: 0, y: 30, rotateX: 8 }} animate={teamVisible ? { opacity: 1, y: 0, rotateX: 0 } : {}} transition={{ duration: 0.5, delay: i * 0.08 }}
+              <motion.div key={`${member.name}-${i}`} initial={{ opacity: 0, y: 30, rotateX: 8 }} animate={teamVisible ? { opacity: 1, y: 0, rotateX: 0 } : {}} transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="group bg-white dark:bg-gray-900 rounded-2xl p-7 border border-gray-100 dark:border-gray-800 hover:border-primary-200 dark:hover:border-primary-600 hover:shadow-xl hover:shadow-primary-500/5 dark:hover:shadow-primary-400/5 transition-all duration-300 card-3d">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-lg"><span className="text-2xl font-bold text-white">{member.name.charAt(0)}</span></div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">{member.name}</h3>
@@ -140,7 +134,6 @@ export default function AboutPage() {
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">{member.bio}</p>
                 <div className="flex gap-3">
                   <a href="#" className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 flex items-center justify-center transition-colors"><Linkedin className="w-4 h-4 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400" /></a>
-                  <a href="#" className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 flex items-center justify-center transition-colors"><Twitter className="w-4 h-4 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400" /></a>
                 </div>
               </motion.div>
             ))}
