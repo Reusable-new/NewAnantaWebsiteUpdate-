@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
+import SEO from '../components/SEO';
+import { buildArticleSchema, buildBreadcrumbSchema } from '../services/seo';
 import { getBlogPostById } from '../services/contentService';
 
 export default function BlogDetailPage() {
@@ -23,6 +25,27 @@ export default function BlogDetailPage() {
 
   return (
     <main className="pt-24 pb-16 bg-white dark:bg-gray-950">
+      <SEO
+        title={post.title}
+        description={post.excerpt}
+        image={post.image}
+        pathname={`/blog/${post.id}`}
+        schema={[
+          buildBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Blog', url: '/blog' },
+            { name: post.title, url: `/blog/${post.id}` },
+          ]),
+          buildArticleSchema({
+            title: post.title,
+            description: post.excerpt,
+            author: post.author,
+            publishDate: post.date,
+            image: post.image,
+            url: `/blog/${post.id}`,
+          }),
+        ]}
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-cyan-50 via-white to-white dark:from-slate-900 dark:via-gray-950 dark:to-gray-950 shadow-2xl shadow-cyan-500/5 p-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">

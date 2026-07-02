@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight, Quote, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema } from '../services/seo';
 import { getTestimonials, Testimonial } from '../services/contentService';
 
 const defaultImage = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2';
@@ -38,6 +40,15 @@ export default function TestimonialsPage() {
 
   return (
     <main className="pt-20">
+      <SEO
+        title="Client Testimonials"
+        description="Read what Ananta Byte’s clients say about our digital transformation, software development, AI, and cloud delivery excellence."
+        pathname="/testimonials"
+        schema={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Testimonials', url: '/testimonials' },
+        ])}
+      />
       {/* Hero */}
       <section className="py-6 hero-gradient relative overflow-hidden">
         <div className="absolute inset-0 mesh-gradient" />

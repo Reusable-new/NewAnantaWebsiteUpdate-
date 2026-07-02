@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import ScrollRevealObserver from './components/ScrollRevealObserver';
+import AnalyticsProvider from './hooks/AnalyticsProvider';
 import HomePage from './pages/HomePage';
 import ServicesPage from './pages/ServicesPage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
@@ -13,6 +14,7 @@ import BlogDetailPage from './pages/BlogDetailPage';
 import ContactPage from './pages/ContactPage';
 import TestimonialsPage from './pages/TestimonialsPage';
 import AdminPage from './pages/AdminPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
@@ -20,6 +22,7 @@ function App() {
       <Router>
         <ScrollToTop />
         <ScrollRevealObserver />
+        <AnalyticsProvider />
         <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-500">
           <Navbar />
           <Routes>
@@ -32,6 +35,7 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/testimonials" element={<TestimonialsPage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <Footer />
         </div>

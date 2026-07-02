@@ -6,6 +6,8 @@ import {
   CheckCircle2, Zap, Shield, Globe, ChevronDown, Star, Users, TrendingUp, Hexagon, Sparkles, Megaphone
 } from 'lucide-react';
 import { useScrollAnimation, use3DTilt, useCountUp } from '../hooks/useAnimations';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema } from '../services/seo';
 import { services } from '../data/services';
 
 const stats = [
@@ -912,5 +914,23 @@ function TestimonialPreview() {
 }
 
 export default function HomePage() {
-  return (<main><HeroSection /><TechStackSection /><ServicesSection /><StatsSection /><WhyChooseSection /><TestimonialPreview /><CTASection /></main>);
+  return (
+    <main>
+      <SEO
+        title="Technology Services for Businesses"
+        description="Ananta Byte delivers enterprise-grade web, mobile, AI, and cloud solutions designed to accelerate growth, improve performance, and drive digital transformation."
+        pathname="/"
+        schema={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+        ])}
+      />
+      <HeroSection />
+      <TechStackSection />
+      <ServicesSection />
+      <StatsSection />
+      <WhyChooseSection />
+      <TestimonialPreview />
+      <CTASection />
+    </main>
+  );
 }

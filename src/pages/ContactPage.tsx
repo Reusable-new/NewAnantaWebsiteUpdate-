@@ -3,6 +3,8 @@ import emailjs from '@emailjs/browser';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, MessageSquare, Building2, Globe } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useAnimations';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema } from '../services/seo';
 import { addLead } from '../services/contentService';
 
 const contactInfo = [
@@ -93,6 +95,15 @@ export default function ContactPage() {
 
   return (
     <main className="pt-20">
+      <SEO
+        title="Contact Ananta Byte"
+        description="Contact Ananta Byte for digital transformation, custom software development, AI solutions, cloud architecture, and enterprise-grade product engineering."
+        pathname="/contact"
+        schema={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Contact', url: '/contact' },
+        ])}
+      />
       {/* Hero */}
       <section ref={heroRef} className="py-24 hero-gradient relative overflow-hidden">
         <div className="absolute inset-0 mesh-gradient" />

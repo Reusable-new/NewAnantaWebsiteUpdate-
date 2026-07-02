@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, UserCheck, Trash2, LogOut } from 'lucide-react';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema } from '../services/seo';
 import { loginAdmin, logoutAdmin, isAdminAuthenticated } from '../services/authService';
 import { addBlogPost, addTestimonial, getBlogPosts, getTestimonials, updateBlogPost, categories, getLeads, removeLead, BlogPost, Testimonial, Lead } from '../services/contentService';
 
@@ -150,6 +152,16 @@ export default function AdminPage() {
 
   return (
     <main className="pt-20 min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white">
+      <SEO
+        title="Admin Portal"
+        description="Admin dashboard for managing blog posts, testimonials, and leads. This page is not indexed by search engines."
+        pathname="/admin"
+        robots="noindex,nofollow"
+        schema={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Admin', url: '/admin' },
+        ])}
+      />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>

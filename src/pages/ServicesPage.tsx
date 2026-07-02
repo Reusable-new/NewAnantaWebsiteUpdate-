@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Code2, Smartphone, Bot, Brain, Palette, Cloud, ArrowRight, CheckCircle2, X, Zap, Layers, Shield, Users, BarChart3, Megaphone } from 'lucide-react';
 import { useScrollAnimation, use3DTilt } from '../hooks/useAnimations';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema } from '../services/seo';
 import { services } from '../data/services';
 
 const processSteps = [
@@ -25,6 +27,15 @@ export default function ServicesPage() {
 
   return (
     <main className="pt-20">
+      <SEO
+        title="IT Services & Solutions"
+        description="Explore Ananta Byte’s full suite of digital services, including web development, mobile apps, AI/ML, UI/UX, cloud solutions, and QA testing for ambitious businesses."
+        pathname="/services"
+        schema={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Services', url: '/services' },
+        ])}
+      />
       {/* Hero */}
       <section ref={heroRef} className="py-24 hero-gradient relative overflow-hidden min-h-[60vh] flex items-center">
         <div className="absolute inset-0 mesh-gradient" />

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://anantabyte.com/</loc>
+    <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>https://anantabyte.com/services</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://anantabyte.com/about</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://anantabyte.com/blog</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://anantabyte.com/contact</loc>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://anantabyte.com/testimonials</loc>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://anantabyte.com/admin</loc>
+    <priority>0.20</priority>
+  </url>
+</urlset>

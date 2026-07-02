@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Target, Heart, Lightbulb, Users, Globe, Zap, Linkedin } from 'lucide-react';
 import { useScrollAnimation, useCountUp } from '../hooks/useAnimations';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema } from '../services/seo';
 
 const values = [
   { icon: Target, title: 'Innovation', desc: 'We push boundaries and embrace emerging technologies to solve complex problems.' },
@@ -39,6 +41,15 @@ export default function AboutPage() {
 
   return (
     <main className="pt-20">
+      <SEO
+        title="About Us"
+        description="Discover how Ananta Byte builds enterprise-ready digital solutions to transform businesses with modern web, cloud, AI, and mobile services."
+        pathname="/about"
+        schema={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'About', url: '/about' },
+        ])}
+      />
       {/* Hero */}
       <section ref={heroRef} className="py-24 hero-gradient relative overflow-hidden">
         <div className="absolute inset-0 mesh-gradient" />

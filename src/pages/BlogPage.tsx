@@ -4,6 +4,8 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react';
 import { ArrowRight, Clock, User, Search, Calendar, BookOpen, TrendingUp, Zap } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useAnimations';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema } from '../services/seo';
 import { categories, getBlogPosts, trendingTopics } from '../services/contentService';
 
 const trendingIconMap: Record<string, LucideIcon> = {
@@ -29,6 +31,15 @@ export default function BlogPage() {
 
   return (
     <main className="pt-20">
+      <SEO
+        title="Blog & Insights"
+        description="Read Ananta Byte’s latest articles on AI, cloud, web performance, technology strategy, and digital transformation for modern businesses."
+        pathname="/blog"
+        schema={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Blog', url: '/blog' },
+        ])}
+      />
       {/* Hero */}
       <section ref={heroRef} className="py-24 hero-gradient relative overflow-hidden">
         <div className="absolute inset-0 mesh-gradient" />

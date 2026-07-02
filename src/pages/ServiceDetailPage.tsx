@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import SEO from '../components/SEO';
+import { buildBreadcrumbSchema, buildServiceSchema } from '../services/seo';
 import { services } from '../data/services';
 
 export default function ServiceDetailPage() {
@@ -23,6 +25,23 @@ export default function ServiceDetailPage() {
 
   return (
     <main className="pt-20 min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white">
+      <SEO
+        title={service.title}
+        description={service.desc}
+        pathname={`/services/${service.slug}`}
+        schema={[
+          buildBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Services', url: '/services' },
+            { name: service.title, url: `/services/${service.slug}` },
+          ]),
+          buildServiceSchema({
+            name: service.title,
+            description: service.desc,
+            url: `/services/${service.slug}`,
+          }),
+        ]}
+      />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 mesh-gradient opacity-30" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
