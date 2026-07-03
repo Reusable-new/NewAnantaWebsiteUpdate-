@@ -14,8 +14,8 @@ const values = [
 ];
 
 const team = [
-  { name: 'Suneel Jha', role: 'CEO', bio: 'Visionary leader guiding Ananta Byte’s strategy, growth, and client success.' },
-  { name: 'Sonam Sharma', role: 'CTO', bio: 'Technology leader driving platform innovation and technical excellence.' },
+  { name: 'Sonam sharma', role: 'CEO', bio: 'Visionary leader guiding Ananta Byte’s strategy, growth, and client success.' },
+  { name: 'Suneel Jha', role: 'CTO', bio: 'Technology leader driving platform innovation and technical excellence.' },
   { name: 'Sonal Seth', role: 'Project Director', bio: 'Operational lead ensuring projects are delivered on time and exceed expectations.' },
 ];
 

@@ -888,7 +888,7 @@ function TestimonialPreview() {
     { name: 'Michael Chen', role: 'CTO, DataSync', text: 'The AI/ML solution they built transformed our data processing. Incredible results.', rating: 5 },
   ];
   return (
-    <section ref={ref} className="py-24 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
+    <section ref={ref} className="hidden md:block py-24 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={isVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="text-center mb-12">
           <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm uppercase tracking-wider">Client Stories</span>
