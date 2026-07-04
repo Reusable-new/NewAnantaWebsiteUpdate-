@@ -1,9 +1,8 @@
-import { useRef, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
-  ArrowRight, Code2, Smartphone, Bot, Brain, Palette, Cloud,
-  CheckCircle2, Zap, Shield, Globe, ChevronDown, Star, Users, TrendingUp, Hexagon, Sparkles, Megaphone
+  ArrowRight, Code2, CheckCircle2, Zap, Shield, Globe, ChevronDown, Star, Users, Hexagon, Sparkles
 } from 'lucide-react';
 import { useScrollAnimation, use3DTilt, useCountUp } from '../hooks/useAnimations';
 import SEO from '../components/SEO';
@@ -200,66 +199,6 @@ function Hero3DObject() {
   );
 }
 
-function HeroBannerImage() {
-  return (
-    <motion.div
-      className="absolute hidden lg:block right-[6%] top-[40%] w-[380px] max-w-full z-30 perspective-1200 pointer-events-none"
-      animate={{ y: [0, -10, 0], rotateZ: [0, 1.5, -1.5, 0], rotateX: [3, 0, 4, 3] }}
-      transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-    >
-      <motion.div
-        className="relative w-full h-[520px] rounded-[2rem] border border-cyan-300/20 bg-slate-950/90 shadow-[0_40px_90px_rgba(14,165,233,0.18)] backdrop-blur-xl overflow-hidden"
-        animate={{ rotateY: [2, -2, 2], rotateX: [4, 1, 4] }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <div className="absolute inset-0 hero-panel-screen" />
-        <div className="absolute inset-4 rounded-[1.75rem] border border-cyan-400/10 bg-slate-950/60 backdrop-blur-2xl shadow-[inset_0_0_40px_rgba(14,165,233,0.12)] overflow-hidden">
-          <div className="absolute top-5 left-5 right-5 flex items-center justify-between gap-3 text-xs uppercase tracking-[0.3em] text-cyan-200/70 font-semibold">
-            <span>Holographic display</span>
-            <span className="px-2 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">Live</span>
-          </div>
-          <div className="absolute inset-x-5 top-20 h-24 rounded-3xl bg-gradient-to-b from-cyan-400/15 via-transparent to-transparent border border-cyan-300/10" />
-          <div className="absolute left-6 top-[12rem] right-6 h-[1px] bg-gradient-to-r from-cyan-400/30 via-transparent to-purple-400/20" />
-          <div className="absolute left-6 top-[13.5rem] w-[70px] h-1 rounded-full bg-cyan-400/40 animate-pulse" />
-          <div className="absolute left-8 top-[15rem] right-8 grid grid-cols-3 gap-3">
-            {['AI', 'Cloud', 'Scale'].map((label, index) => (
-              <div key={index} className="rounded-3xl border border-cyan-500/10 bg-slate-900/90 p-3 text-[0.76rem] text-cyan-100/80">
-                <div className="text-sm font-semibold text-white">{label}</div>
-                <div className="mt-2 h-1 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500/50" />
-                <div className="mt-2 text-[0.68rem] text-cyan-200/60">Realtime stream</div>
-              </div>
-            ))}
-          </div>
-
-          <motion.div
-            className="absolute inset-x-8 top-[10rem] h-[18rem] rounded-[2rem] border border-cyan-400/10 bg-cyan-500/5 overflow-hidden"
-            animate={{ rotateY: [0, 5, 0, -5, 0], opacity: [0.8, 1, 0.8, 1, 0.8] }}
-            transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.12),transparent_48%)]" />
-            <motion.div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border border-cyan-300/30 bg-cyan-400/10 shadow-[0_0_40px_rgba(56,189,248,0.18)]"
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-            />
-            <div className="absolute left-[16%] top-[20%] h-[72px] w-[4px] rounded-full bg-cyan-400/30 blur-xl" />
-            <div className="absolute right-[18%] top-[26%] h-[56px] w-[4px] rounded-full bg-purple-400/30 blur-xl" />
-            <div className="absolute left-[20%] bottom-[18%] h-[6px] w-24 rounded-full bg-cyan-300/40 blur-sm" />
-            <div className="absolute right-[20%] bottom-[22%] h-[6px] w-28 rounded-full bg-purple-300/40 blur-sm" />
-            <div className="absolute inset-x-10 top-[12rem] h-px bg-gradient-to-r from-cyan-300/60 via-transparent to-purple-300/60" />
-            <div className="absolute inset-x-12 top-[9rem] h-px bg-gradient-to-r from-transparent via-cyan-300/40 to-transparent" />
-            <div className="absolute inset-x-12 top-[14rem] h-px bg-gradient-to-r from-transparent via-purple-300/40 to-transparent" />
-          </motion.div>
-
-          <div className="absolute left-7 bottom-20 w-14 h-14 rounded-full bg-cyan-500/15 border border-cyan-400/20 shadow-[0_0_30px_rgba(56,189,248,0.12)]" />
-          <div className="absolute right-7 bottom-20 w-14 h-14 rounded-full bg-purple-500/15 border border-purple-400/15 shadow-[0_0_30px_rgba(168,85,247,0.12)]" />
-          <div className="absolute left-10 bottom-8 right-10 h-16 bg-gradient-to-r from-cyan-400/20 via-transparent to-purple-400/20 rounded-3xl border border-cyan-300/10" />
-        </div>
-        <div className="absolute inset-x-10 top-6 h-1 rounded-full bg-gradient-to-r from-cyan-300/40 via-transparent to-purple-300/40 animate-pulse" />
-      </motion.div>
-    </motion.div>
-  );
-}
 
 function GlitchText({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
@@ -888,11 +827,19 @@ function TestimonialPreview() {
   const [list, setList] = useState<Testimonial[]>([]);
 
   useEffect(() => {
-    try {
-      setList(getTestimonials());
-    } catch (e) {
-      setList([]);
+    let canceled = false;
+    async function loadTestimonials() {
+      try {
+        const testimonials = await getTestimonials();
+        if (!canceled) setList(testimonials);
+      } catch {
+        if (!canceled) setList([]);
+      }
     }
+    loadTestimonials();
+    return () => {
+      canceled = true;
+    };
   }, []);
 
   if (!list || list.length === 0) return null;

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
@@ -6,7 +6,7 @@ import { ArrowRight, Clock, User, Search, Calendar, BookOpen, TrendingUp, Zap } 
 import { useScrollAnimation } from '../hooks/useAnimations';
 import SEO from '../components/SEO';
 import { buildBreadcrumbSchema } from '../services/seo';
-import { categories, getBlogPosts, trendingTopics } from '../services/contentService';
+import { BlogPost, categories, getRemoteBlogPostsOrLocal, trendingTopics } from '../services/contentService';
 
 const trendingIconMap: Record<string, LucideIcon> = {
   'Generative AI': Zap,
@@ -17,7 +17,34 @@ const trendingIconMap: Record<string, LucideIcon> = {
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const posts = getBlogPosts();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let canceled = false;
+
+    async function loadPosts() {
+      const data = await getRemoteBlogPostsOrLocal();
+      if (!canceled) {
+        setPosts(data);
+        setLoading(false);
+      }
+    }
+
+    loadPosts();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="pt-20 text-center">
+        <p className="text-gray-600 dark:text-gray-300">Loading blog posts...</p>
+      </main>
+    );
+  }
+
   const filteredPosts = posts.filter((post) => {
     const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());

@@ -1,13 +1,44 @@
 import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import SEO from '../components/SEO';
 import { buildArticleSchema, buildBreadcrumbSchema } from '../services/seo';
-import { getBlogPostById } from '../services/contentService';
+import { BlogPost, getBlogPostByIdOrLocal } from '../services/contentService';
 
 export default function BlogDetailPage() {
   const { id } = useParams();
-  const post = getBlogPostById(Number(id));
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let canceled = false;
+
+    async function loadPost() {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+      const fetched = await getBlogPostByIdOrLocal(Number(id));
+      if (!canceled) {
+        setPost(fetched);
+        setLoading(false);
+      }
+    }
+
+    loadPost();
+    return () => {
+      canceled = true;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white px-4">
+        <p className="text-lg">Loading article...</p>
+      </main>
+    );
+  }
 
   if (!post) {
     return (

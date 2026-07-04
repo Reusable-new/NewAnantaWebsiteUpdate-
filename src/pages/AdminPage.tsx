@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, UserCheck, Trash2, LogOut } from 'lucide-react';
+import { Plus, UserCheck, Trash2, LogOut, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { buildBreadcrumbSchema } from '../services/seo';
 import { loginAdmin, logoutAdmin, isAdminAuthenticated } from '../services/authService';
-import { addBlogPost, addTestimonial, getBlogPosts, getTestimonials, updateBlogPost, categories, getLeads, removeLead, BlogPost, Testimonial, Lead } from '../services/contentService';
+import { addBlogPost, addTestimonial, getBlogPosts, getTestimonials, getRemoteBlogPostsOrLocal, getLeads, updateBlogPost, deleteBlogPost, categories, removeLead, BlogPost, Testimonial, Lead } from '../services/contentService';
+import { isFirebaseConfigured } from '../services/firebase';
+import { removeRemoteTestimonial, uploadImageToFirebase } from '../services/firebaseContentService';
 
 const defaultBlogForm = {
   title: '',
@@ -31,12 +33,17 @@ export default function AdminPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [blogForm, setBlogForm] = useState(defaultBlogForm);
   const [editingBlogId, setEditingBlogId] = useState<number | null>(null);
   const [testimonialForm, setTestimonialForm] = useState(defaultTestimonialForm);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(getBlogPosts());
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(getTestimonials());
-  const [leads, setLeads] = useState<Lead[]>(getLeads());
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [blogSubmitting, setBlogSubmitting] = useState(false);
+  const [testimonialSubmitting, setTestimonialSubmitting] = useState(false);
+  const [blogUploadingImage, setBlogUploadingImage] = useState(false);
+  const [testimonialUploadingImage, setTestimonialUploadingImage] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +51,10 @@ export default function AdminPage() {
     if (success) {
       setAuthenticated(true);
       setError('');
+      setSuccessMessage('Signed in successfully.');
     } else {
       setError('Invalid username or password.');
+      setSuccessMessage('');
     }
   };
 
@@ -54,74 +63,148 @@ export default function AdminPage() {
     setAuthenticated(false);
     setUsername('');
     setPassword('');
+    setError('');
+    setSuccessMessage('Signed out successfully.');
   };
 
-  const handleBlogChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleBlogChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, checked, files } = e.target as HTMLInputElement;
 
     if (name === 'imageFile' && type === 'file' && files?.[0]) {
       const file = files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        setBlogForm((prev) => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      setBlogUploadingImage(true);
+      setError('');
+
+      try {
+        if (isFirebaseConfigured) {
+          const uploadedUrl = await uploadImageToFirebase(file, 'blog-images');
+          if (uploadedUrl) {
+            setBlogForm((prev) => ({ ...prev, image: uploadedUrl }));
+          } else {
+            throw new Error('Image upload failed. Please check your Firebase configuration.');
+          }
+        } else {
+          throw new Error('Firebase storage is not configured.');
+        }
+      } catch (uploadError) {
+        console.error('Blog image upload failed', uploadError);
+        const reader = new FileReader();
+        reader.onload = () => {
+          setBlogForm((prev) => ({ ...prev, image: reader.result as string }));
+        };
+        reader.readAsDataURL(file);
+        setError('Image upload to Firebase could not complete, so the image was stored locally for this session.');
+      } finally {
+        setBlogUploadingImage(false);
+      }
       return;
     }
 
     setBlogForm((prev) => ({ ...prev, [name]: name === 'featured' ? checked : value }));
   };
 
-  const handleTestimonialChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleTestimonialChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type, files } = e.target as HTMLInputElement;
 
     if (name === 'imageFile' && type === 'file' && files?.[0]) {
       const file = files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        setTestimonialForm((prev) => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      setTestimonialUploadingImage(true);
+      setError('');
+
+      try {
+        if (isFirebaseConfigured) {
+          const uploadedUrl = await uploadImageToFirebase(file, 'testimonial-images');
+          if (uploadedUrl) {
+            setTestimonialForm((prev) => ({ ...prev, image: uploadedUrl }));
+          } else {
+            throw new Error('Image upload failed. Please check your Firebase configuration.');
+          }
+        } else {
+          throw new Error('Firebase storage is not configured.');
+        }
+      } catch (uploadError) {
+        console.error('Testimonial image upload failed', uploadError);
+        const reader = new FileReader();
+        reader.onload = () => {
+          setTestimonialForm((prev) => ({ ...prev, image: reader.result as string }));
+        };
+        reader.readAsDataURL(file);
+        setError('Image upload to Firebase could not complete, so the image was stored locally for this session.');
+      } finally {
+        setTestimonialUploadingImage(false);
+      }
       return;
     }
 
     setTestimonialForm((prev) => ({ ...prev, [name]: name === 'rating' ? Number(value) : value }));
   };
 
-  const submitBlog = (e: React.FormEvent) => {
+  const submitBlog = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (blogSubmitting || blogUploadingImage) return;
 
-    const entry = {
-      ...blogForm,
-      featured: Boolean(blogForm.featured),
-      image: blogForm.image,
-    };
+    setBlogSubmitting(true);
+    setError('');
+    setSuccessMessage('');
 
-    if (editingBlogId !== null) {
-      const updatedPost = updateBlogPost(editingBlogId, entry);
-      if (updatedPost) {
-        setBlogPosts((prev) => prev.map((post) => (post.id === editingBlogId ? updatedPost : post)));
+    try {
+      const entry = {
+        ...blogForm,
+        featured: Boolean(blogForm.featured),
+        image: blogForm.image,
+      };
+
+      if (editingBlogId !== null) {
+        const updatedPost = await updateBlogPost(editingBlogId, entry);
+        if (updatedPost) {
+          setBlogPosts((prev) => prev.map((post) => (post.id === editingBlogId ? updatedPost : post)));
+        }
+        setEditingBlogId(null);
+        setSuccessMessage('Blog post updated successfully.');
+      } else {
+        const newPost = await addBlogPost(entry);
+        setBlogPosts((prev) => [newPost, ...prev]);
+        setSuccessMessage('Blog post published successfully.');
       }
-      setEditingBlogId(null);
-    } else {
-      const newPost = addBlogPost(entry);
-      setBlogPosts((prev) => [newPost, ...prev]);
+
+      setBlogForm(defaultBlogForm);
+    } catch (submitError) {
+      console.error('Blog submission failed', submitError);
+      setError('Blog post could not be saved. Please try again.');
+    } finally {
+      setBlogSubmitting(false);
     }
-
-    setBlogForm(defaultBlogForm);
   };
 
-  const submitTestimonial = (e: React.FormEvent) => {
+  const submitTestimonial = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newEntry = addTestimonial(testimonialForm);
-    setTestimonials((prev) => [newEntry, ...prev]);
-    setTestimonialForm(defaultTestimonialForm);
+    if (testimonialSubmitting || testimonialUploadingImage) return;
+
+    setTestimonialSubmitting(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const newEntry = await addTestimonial(testimonialForm);
+      setTestimonials((prev) => [newEntry, ...prev]);
+      setTestimonialForm(defaultTestimonialForm);
+      setSuccessMessage('Testimonial published successfully.');
+    } catch (submitError) {
+      console.error('Testimonial submission failed', submitError);
+      setError('Testimonial could not be saved. Please try again.');
+    } finally {
+      setTestimonialSubmitting(false);
+    }
   };
 
-  const removeBlogPost = (id: number) => {
+  const removeBlogPost = async (id: number) => {
     const updated = blogPosts.filter((item) => item.id !== id);
     setBlogPosts(updated);
-    localStorage.setItem('anantabyte-blog-posts', JSON.stringify(updated));
+    if (isFirebaseConfigured) {
+      await deleteBlogPost(id);
+    } else {
+      localStorage.setItem('anantabyte-blog-posts', JSON.stringify(updated));
+    }
     if (editingBlogId === id) {
       setEditingBlogId(null);
       setBlogForm(defaultBlogForm);
@@ -139,14 +222,49 @@ export default function AdminPage() {
     setBlogForm(defaultBlogForm);
   };
 
-  const removeTestimonial = (name: string) => {
+  useEffect(() => {
+    if (!successMessage) return;
+    const timer = window.setTimeout(() => setSuccessMessage(''), 3000);
+    return () => window.clearTimeout(timer);
+  }, [successMessage]);
+
+  useEffect(() => {
+    let canceled = false;
+
+    async function loadAdminData() {
+      const [posts, testimonialsData, leadData] = await Promise.all([
+        getRemoteBlogPostsOrLocal(),
+        getTestimonials(),
+        getLeads(),
+      ]);
+
+      if (canceled) return;
+      setBlogPosts(posts);
+      setTestimonials(testimonialsData);
+      setLeads(leadData);
+    }
+
+    loadAdminData();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  const removeTestimonial = async (name: string) => {
     const updated = testimonials.filter((item) => item.name !== name);
     setTestimonials(updated);
+    if (isFirebaseConfigured) {
+      const toRemove = testimonials.find((item) => item.name === name);
+      if (toRemove?.id) {
+        await removeRemoteTestimonial(toRemove.id);
+      }
+      return;
+    }
     localStorage.setItem('anantabyte-testimonials', JSON.stringify(updated));
   };
 
-  const handleRemoveLead = (id: number) => {
-    const updated = removeLead(id);
+  const handleRemoveLead = async (id: number) => {
+    const updated = await removeLead(id);
     setLeads(updated);
   };
 
@@ -174,6 +292,11 @@ export default function AdminPage() {
 
         {authenticated ? (
           <div className="space-y-10">
+            {(error || successMessage) && (
+              <div className={`rounded-2xl border px-4 py-3 text-sm ${error ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300' : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'}`}>
+                {error || successMessage}
+              </div>
+            )}
             <div className="flex items-center justify-between gap-4">
               <div className="rounded-3xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700 w-full">
                 <h2 className="text-xl font-semibold mb-3">Add Blog Post</h2>
@@ -202,7 +325,7 @@ export default function AdminPage() {
                   <div className="grid grid-cols-1 gap-4">
                     <input name="image" value={blogForm.image} onChange={handleBlogChange} placeholder="Image URL (optional)" className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm" />
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Upload Image (optional)</label>
-                    <input name="imageFile" type="file" accept="image/*" onChange={handleBlogChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-primary-600 file:text-white hover:file:bg-primary-700" />
+                    <input name="imageFile" type="file" accept="image/*" capture="environment" disabled={blogUploadingImage} onChange={handleBlogChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-primary-600 file:text-white hover:file:bg-primary-700 disabled:opacity-60" />
                   </div>
                   {blogForm.image && (
                     <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 mt-2">
@@ -210,7 +333,7 @@ export default function AdminPage() {
                     </div>
                   )}
                   <div className="flex flex-wrap gap-3 items-center">
-                    <button type="submit" className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition">{editingBlogId !== null ? 'Update Blog' : 'Publish Blog'} <Plus className="w-4 h-4" /></button>
+                    <button type="submit" disabled={blogSubmitting || blogUploadingImage} className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition disabled:opacity-70 disabled:cursor-not-allowed">{blogSubmitting ? (<><Loader2 className="w-4 h-4 animate-spin" /> {editingBlogId !== null ? 'Updating...' : 'Publishing...'}</>) : (<>{editingBlogId !== null ? 'Update Blog' : 'Publish Blog'} <Plus className="w-4 h-4" /></>)} </button>
                     {editingBlogId !== null && <button type="button" onClick={cancelEditBlog} className="inline-flex items-center gap-2 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>}
                   </div>
                 </form>
@@ -228,14 +351,14 @@ export default function AdminPage() {
                   </div>
                   <div className="grid grid-cols-1 gap-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Upload Image (optional)</label>
-                    <input name="imageFile" type="file" accept="image/*" onChange={handleTestimonialChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-primary-600 file:text-white hover:file:bg-primary-700" />
+                    <input name="imageFile" type="file" accept="image/*" capture="environment" disabled={testimonialUploadingImage} onChange={handleTestimonialChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-primary-600 file:text-white hover:file:bg-primary-700 disabled:opacity-60" />
                   </div>
                   {testimonialForm.image && (
                     <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 mt-2">
                       <img src={testimonialForm.image} alt="Selected testimonial" className="w-full h-40 object-cover" />
                     </div>
                   )}
-                  <button type="submit" className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition">Publish Testimonial <Plus className="w-4 h-4" /></button>
+                  <button type="submit" disabled={testimonialSubmitting || testimonialUploadingImage} className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition disabled:opacity-70 disabled:cursor-not-allowed">{testimonialSubmitting ? (<><Loader2 className="w-4 h-4 animate-spin" /> Publishing...</>) : (<>Publish Testimonial <Plus className="w-4 h-4" /></>)} </button>
                 </form>
               </div>
             </div>

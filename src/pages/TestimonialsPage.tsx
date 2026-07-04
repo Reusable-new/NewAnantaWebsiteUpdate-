@@ -12,7 +12,17 @@ export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
-    setTestimonials(getTestimonials());
+    let canceled = false;
+
+    async function loadTestimonials() {
+      const testimonials = await getTestimonials();
+      if (!canceled) setTestimonials(testimonials);
+    }
+
+    loadTestimonials();
+    return () => {
+      canceled = true;
+    };
   }, []);
   const [currentPair, setCurrentPair] = useState(0);
   const totalPairs = Math.ceil(testimonials.length / 2);

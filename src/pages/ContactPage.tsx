@@ -38,7 +38,7 @@ export default function ContactPage() {
     setError('');
     setStatusMessage('');
 
-    addLead({
+    await addLead({
       name: formData.name,
       email: formData.email,
       company: formData.company,

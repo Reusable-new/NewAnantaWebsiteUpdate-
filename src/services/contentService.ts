@@ -1,4 +1,17 @@
 import { categories, blogPosts as initialBlogPosts, trendingTopics } from '../data/blogPosts';
+import { isFirebaseConfigured } from './firebase';
+import {
+  getRemoteBlogPosts,
+  getRemoteBlogPostById,
+  saveRemoteBlogPost,
+  updateRemoteBlogPost,
+  deleteRemoteBlogPost,
+  getRemoteTestimonials,
+  addRemoteTestimonial,
+  getRemoteLeads,
+  saveRemoteLead,
+  removeRemoteLead,
+} from './firebaseContentService';
 
 const BLOG_STORAGE_KEY = 'anantabyte-blog-posts';
 const TESTIMONIALS_STORAGE_KEY = 'anantabyte-testimonials';
@@ -13,9 +26,11 @@ export type BlogPost = {
   readTime: string;
   featured: boolean;
   image: string;
+  createdAt?: string;
 };
 
 export type Testimonial = {
+  id?: string;
   name: string;
   role: string;
   company: string;
@@ -61,6 +76,21 @@ export function getBlogPosts(): BlogPost[] {
   return initialBlogPosts;
 }
 
+export async function getRemoteBlogPostsOrLocal(): Promise<BlogPost[]> {
+  if (isFirebaseConfigured) {
+    return await getRemoteBlogPosts();
+  }
+  return getBlogPosts();
+}
+
+export async function getBlogPostByIdOrLocal(id: number): Promise<BlogPost | null> {
+  if (isFirebaseConfigured) {
+    const remotePost = await getRemoteBlogPostById(id);
+    if (remotePost) return remotePost;
+  }
+  return getBlogPostById(id) ?? null;
+}
+
 export function getBlogPostById(id: number) {
   return getBlogPosts().find((post) => post.id === id);
 }
@@ -71,16 +101,22 @@ export function saveBlogPosts(posts: BlogPost[]) {
 
 const defaultBlogImage = 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1200';
 
-export function addBlogPost(post: Omit<BlogPost, 'id'>) {
-  const posts = getBlogPosts();
-  const nextId = posts.length > 0 ? Math.max(...posts.map((item) => item.id)) + 1 : 1;
-  const newPost = { ...post, id: nextId, image: post.image || defaultBlogImage };
-  const updated = [newPost, ...posts];
-  saveBlogPosts(updated);
+export async function addBlogPost(post: Omit<BlogPost, 'id'>) {
+  const newPost = { ...post, id: Date.now(), image: post.image || defaultBlogImage };
+  if (isFirebaseConfigured) {
+    await saveRemoteBlogPost(post);
+  } else {
+    const posts = getBlogPosts();
+    const updated = [newPost, ...posts];
+    saveBlogPosts(updated);
+  }
   return newPost;
 }
 
-export function updateBlogPost(id: number, updates: Partial<Omit<BlogPost, 'id'>>) {
+export async function updateBlogPost(id: number, updates: Partial<Omit<BlogPost, 'id'>>) {
+  if (isFirebaseConfigured) {
+    return await updateRemoteBlogPost(id, updates);
+  }
   const posts = getBlogPosts();
   const updatedPosts = posts.map((post) => {
     if (post.id !== id) return post;
@@ -94,7 +130,19 @@ export function updateBlogPost(id: number, updates: Partial<Omit<BlogPost, 'id'>
   return updatedPosts.find((post) => post.id === id);
 }
 
-export function getLeads(): Lead[] {
+export async function deleteBlogPost(id: number) {
+  if (isFirebaseConfigured) {
+    await deleteRemoteBlogPost(id);
+    return;
+  }
+  const updated = getBlogPosts().filter((post) => post.id !== id);
+  saveBlogPosts(updated);
+}
+
+export async function getLeads(): Promise<Lead[]> {
+  if (isFirebaseConfigured) {
+    return await getRemoteLeads();
+  }
   const stored = localStorage.getItem(LEADS_STORAGE_KEY);
   if (stored) {
     try {
@@ -110,8 +158,11 @@ export function saveLeads(leads: Lead[]) {
   localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(leads));
 }
 
-export function addLead(lead: Omit<Lead, 'id' | 'createdAt' | 'status'>) {
-  const leads = getLeads();
+export async function addLead(lead: Omit<Lead, 'id' | 'createdAt' | 'status'>) {
+  if (isFirebaseConfigured) {
+    return await saveRemoteLead(lead);
+  }
+  const leads = await getLeads();
   const newLead: Lead = {
     ...lead,
     id: leads.length > 0 ? Math.max(...leads.map((item) => item.id)) + 1 : 1,
@@ -123,13 +174,22 @@ export function addLead(lead: Omit<Lead, 'id' | 'createdAt' | 'status'>) {
   return newLead;
 }
 
-export function removeLead(id: number) {
-  const updated = getLeads().filter((lead) => lead.id !== id);
+export async function removeLead(id: number) {
+  if (isFirebaseConfigured) {
+    await removeRemoteLead(id);
+    return await getLeads();
+  }
+  const leads = await getLeads();
+  const updated = leads.filter((lead) => lead.id !== id);
   saveLeads(updated);
   return updated;
 }
 
-export function getTestimonials(): Testimonial[] {
+export async function getTestimonials(): Promise<Testimonial[]> {
+  if (isFirebaseConfigured) {
+    return await getRemoteTestimonials();
+  }
+
   const stored = localStorage.getItem(TESTIMONIALS_STORAGE_KEY);
   if (stored !== null) {
     try {
@@ -151,12 +211,18 @@ export function saveTestimonials(testimonials: Testimonial[]) {
   localStorage.setItem(TESTIMONIALS_STORAGE_KEY, JSON.stringify(testimonials));
 }
 
-export function addTestimonial(testimonial: Omit<Testimonial, 'image'> & { image?: string }) {
-  const entries = getTestimonials();
+export async function addTestimonial(testimonial: Omit<Testimonial, 'image'> & { image?: string }) {
   const newTestimonial: Testimonial = {
     image: testimonial.image || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
     ...testimonial,
   } as Testimonial;
+
+  if (isFirebaseConfigured) {
+    await addRemoteTestimonial(testimonial);
+    return newTestimonial;
+  }
+
+  const entries = await getTestimonials();
   const updated = [newTestimonial, ...entries];
   saveTestimonials(updated);
   return newTestimonial;
