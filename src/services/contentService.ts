@@ -137,7 +137,6 @@ export function getTestimonials(): Testimonial[] {
       if (Array.isArray(parsed)) {
         return parsed as Testimonial[];
       }
-      // Clear invalid stored data so a stale malformed payload doesn't restore default testimonials.
       localStorage.removeItem(TESTIMONIALS_STORAGE_KEY);
       return [];
     } catch {
@@ -145,7 +144,7 @@ export function getTestimonials(): Testimonial[] {
       return [];
     }
   }
-  return initialTestimonials;
+  return [];
 }
 
 export function saveTestimonials(testimonials: Testimonial[]) {

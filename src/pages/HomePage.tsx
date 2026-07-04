@@ -9,7 +9,7 @@ import { useScrollAnimation, use3DTilt, useCountUp } from '../hooks/useAnimation
 import SEO from '../components/SEO';
 import { buildBreadcrumbSchema } from '../services/seo';
 import { services } from '../data/services';
-import { getTestimonials, type Testimonial, initialTestimonials } from '../services/contentService';
+import { getTestimonials, type Testimonial } from '../services/contentService';
 
 const stats = [
   { value: 5, suffix: '+', label: 'Projects Delivered' },
@@ -891,7 +891,7 @@ function TestimonialPreview() {
     try {
       setList(getTestimonials());
     } catch (e) {
-      setList(initialTestimonials);
+      setList([]);
     }
   }, []);
 
