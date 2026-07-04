@@ -9,6 +9,7 @@ import { useScrollAnimation, use3DTilt, useCountUp } from '../hooks/useAnimation
 import SEO from '../components/SEO';
 import { buildBreadcrumbSchema } from '../services/seo';
 import { services } from '../data/services';
+import { getTestimonials, type Testimonial, initialTestimonials } from '../services/contentService';
 
 const stats = [
   { value: 5, suffix: '+', label: 'Projects Delivered' },
@@ -881,28 +882,41 @@ function CTASection() {
   );
 }
 
+/* Testimonials removed from HomePage — managed via the Testimonials page or Admin upload */
+
 function TestimonialPreview() {
   const { ref, isVisible } = useScrollAnimation();
-  const previewTestimonials = [
-    { name: 'Sarah Johnson', role: 'CEO, TechFlow', text: 'Ananta Byte delivered our platform ahead of schedule. Their expertise in cloud solutions is unmatched.', rating: 5 },
-    { name: 'Michael Chen', role: 'CTO, DataSync', text: 'The AI/ML solution they built transformed our data processing. Incredible results.', rating: 5 },
-  ];
+  const [list, setList] = useState<Testimonial[]>([]);
+
+  useEffect(() => {
+    try {
+      const t = getTestimonials();
+      setList(t && t.length > 0 ? t : initialTestimonials);
+    } catch (e) {
+      setList(initialTestimonials);
+    }
+  }, []);
+
+  if (!list || list.length === 0) return null;
+
+  const preview = list.slice(0, 2);
+
   return (
-    <section ref={ref} className="hidden md:block py-24 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
+    <section ref={ref} className="py-24 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={isVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="text-center mb-12">
+        <motion.div initial={{ opacity: 1, y: 0 }} animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center mb-12">
           <span className="text-primary-600 dark:text-primary-400 font-semibold text-sm uppercase tracking-wider">Client Stories</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mt-2 mb-4">What Our <span className="gradient-text">Clients Say</span></h2>
         </motion.div>
         <div className="grid md:grid-cols-2 gap-8 perspective-1000">
-          {previewTestimonials.map((t, i) => (
-            <motion.div key={t.name} initial={{ opacity: 0, y: 40, rotateY: i === 0 ? -8 : 8, rotateX: 5 }} animate={isVisible ? { opacity: 1, y: 0, rotateY: 0, rotateX: 0 } : {}} transition={{ duration: 0.7, delay: i * 0.2, type: 'spring', stiffness: 80 }}
+          {preview.map((t, i) => (
+            <motion.div key={t.name} initial={{ opacity: 1, y: 0, rotateY: 0, rotateX: 0 }} animate={isVisible ? { opacity: 1, y: 0, rotateY: 0, rotateX: 0 } : { opacity: 1, y: 0, rotateY: 0, rotateX: 0 }} transition={{ duration: 0.7, delay: i * 0.2, type: 'spring', stiffness: 80 }}
               className="group bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-600 hover:shadow-xl hover:shadow-primary-500/5 dark:hover:shadow-primary-400/5 transition-all duration-300 card-3d preserve-3d">
-              <div className="flex gap-1 mb-4">{Array.from({ length: t.rating }).map((_, j) => (<Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />))}</div>
+              <div className="flex gap-1 mb-4">{Array.from({ length: t.rating || 5 }).map((_, j) => (<Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />))}</div>
               <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed italic">"{t.text}"</p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-md"><span className="text-white font-bold text-sm">{t.name.charAt(0)}</span></div>
-                <div><div className="text-sm font-semibold text-gray-900 dark:text-white">{t.name}</div><div className="text-xs text-gray-500 dark:text-gray-400">{t.role}</div></div>
+                <div><div className="text-sm font-semibold text-gray-900 dark:text-white">{t.name}</div><div className="text-xs text-gray-500 dark:text-gray-400">{t.role}{t.company ? `, ${t.company}` : ''}</div></div>
               </div>
             </motion.div>
           ))}

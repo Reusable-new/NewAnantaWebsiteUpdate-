@@ -8,7 +8,7 @@ import { buildBreadcrumbSchema } from '../services/seo';
 import { addLead } from '../services/contentService';
 
 const contactInfo = [
-  { icon: Mail, label: 'Email', value: 'contact@anantbyte.com', desc: 'We respond within 2 hours' },
+  { icon: Mail, label: 'Email', value: 'contacta@anantbyte.com', desc: 'We respond within 2 hours' },
   { icon: Phone, label: 'Phone', value: '+91-8009976304', desc: 'Mon-Fri 9am-6pm PST' },
   { icon: MapPin, label: 'Office', value: 'Innovation Drive', desc: 'Hall no- 6, 7, Vikas Mall, vasant vihar, Dehradun' },
   { icon: Clock, label: 'Hours', value: '9:00 AM - 6:00 PM', desc: 'Monday to Friday, IST & UTC' },
@@ -70,7 +70,7 @@ export default function ContactPage() {
           user_service: formData.service,
           user_budget: formData.budget,
           user_message: formData.message,
-          admin_email: 'contact@anantbyte.com',
+          admin_email: 'contact@anantabyte.com',
         },
         publicKey
       );
@@ -185,7 +185,7 @@ export default function ContactPage() {
                 <p className="text-primary-200 text-sm mb-4">Need immediate assistance? Our team is available for urgent inquiries.</p>
                 <div className="space-y-3">
                   <a href="tel:+15551234567" className="flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors"><Phone className="w-4 h-4" /> +91 8009976304</a>
-                  <a href="mailto:contact@anantbyte.com" className="flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors"><Mail className="w-4 h-4" /> contact@anantbyte.com</a>
+                  <a href="mailto:contact@anantabyte.com" className="flex items-center gap-2 text-white/90 hover:text-white text-sm transition-colors"><Mail className="w-4 h-4" /> byte.com</a>
                 </div>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">

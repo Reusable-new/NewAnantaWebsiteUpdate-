@@ -38,7 +38,7 @@ export type Lead = {
 
 const LEADS_STORAGE_KEY = 'anantabyte-leads';
 
-const initialTestimonials: Testimonial[] = [
+export const initialTestimonials: Testimonial[] = [
   { name: 'Sarah Johnson', role: 'CEO', company: 'TechFlow', text: 'Ananta Byte delivered our platform ahead of schedule with exceptional quality. Their cloud solutions expertise transformed our infrastructure, reducing costs by 40% while improving performance 3x.', rating: 5, image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
   { name: 'Michael Chen', role: 'CTO', company: 'DataSync', text: 'The AI/ML solution they built transformed our data processing pipeline. We went from hours of batch processing to real-time analytics. Their team truly understands enterprise-scale challenges.', rating: 5, image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
   { name: 'Emily Rodriguez', role: 'VP of Product', company: 'HealthPlus', text: 'Our mobile app went from concept to App Store in just 4 months. The user feedback has been overwhelmingly positive, with a 4.8-star rating and 100K+ downloads in the first quarter.', rating: 5, image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
@@ -133,7 +133,11 @@ export function getTestimonials(): Testimonial[] {
   const stored = localStorage.getItem(TESTIMONIALS_STORAGE_KEY);
   if (stored) {
     try {
-      return JSON.parse(stored) as Testimonial[];
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed as Testimonial[];
+      }
+      // if parsed is empty or not an array, fall through to return initialTestimonials
     } catch {
       // ignore parse errors and fallback to initial data
     }
