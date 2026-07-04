@@ -33,7 +33,7 @@ export default function TestimonialsPage() {
   if (testimonials.length === 0) {
     return (
       <main className="pt-20 text-center">
-        <p className="text-gray-600 dark:text-gray-300">Loading testimonials...</p>
+        <p className="text-gray-600 dark:text-gray-300">No testimonials have been published yet.</p>
       </main>
     );
   }

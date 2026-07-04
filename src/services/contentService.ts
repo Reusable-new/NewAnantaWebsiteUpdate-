@@ -131,15 +131,18 @@ export function removeLead(id: number) {
 
 export function getTestimonials(): Testimonial[] {
   const stored = localStorage.getItem(TESTIMONIALS_STORAGE_KEY);
-  if (stored) {
+  if (stored !== null) {
     try {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed as Testimonial[];
       }
-      // if parsed is empty or not an array, fall through to return initialTestimonials
+      // Clear invalid stored data so a stale malformed payload doesn't restore default testimonials.
+      localStorage.removeItem(TESTIMONIALS_STORAGE_KEY);
+      return [];
     } catch {
-      // ignore parse errors and fallback to initial data
+      localStorage.removeItem(TESTIMONIALS_STORAGE_KEY);
+      return [];
     }
   }
   return initialTestimonials;

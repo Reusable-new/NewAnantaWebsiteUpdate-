@@ -890,8 +890,7 @@ function TestimonialPreview() {
 
   useEffect(() => {
     try {
-      const t = getTestimonials();
-      setList(t && t.length > 0 ? t : initialTestimonials);
+      setList(getTestimonials());
     } catch (e) {
       setList(initialTestimonials);
     }
